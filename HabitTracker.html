@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker App</title>
+    <style>
+        /* Add your styles here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .habit-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 20px auto;
+            max-width: 300px;
+        }
+
+        .habit-item {
+            margin-bottom: 10px;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .habit-item label {
+            flex-grow: 1;
+            padding-left: 15px;
+        }
+
+        .habit-item button {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .edit-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        input[type="color"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Habit Tracker</h1>
+
+    <ul class="habit-list" id="habitList">
+        <!-- Habits will be dynamically added here -->
+    </ul>
+
+    <div class="edit-modal" id="editModal">
+        <h2>Edit Habit</h2>
+        <input type="text" id="editLabel" placeholder="New habit label">
+        <input type="color" id="editColor" value="#007bff">
+        <input type="submit" value="Save" onclick="saveEdit()">
+        <button onclick="closeModal()">Cancel</button>
+    </div>
+
+    <div>
+        <input type="text" id="newHabit" placeholder="Add a new habit">
+        <input type="submit" value="Add" onclick="addHabit()">
+    </div>
+
+    <script>
+        let currentEditId;
+
+        function addHabit() {
+            const habitInput = document.getElementById("newHabit");
+            const habitList = document.getElementById("habitList");
+
+            if (habitInput.value.trim() !== "") {
+                const habitId = "habit" + (habitList.childElementCount + 1);
+
+                const newHabitItem = createHabitItem(habitId, habitInput.value);
+                habitList.appendChild(newHabitItem);
+
+                habitInput.value = "";
+            }
+        }
+
+        function createHabitItem(id, label) {
+            const habitItem = document.createElement("li");
+            habitItem.className = "habit-item";
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.id = id;
+
+            const habitLabel = document.createElement("label");
+            habitLabel.htmlFor = id;
+            habitLabel.textContent = label;
+
+            const editButton = document.createElement("button");
+            editButton.textContent = "Edit";
+            editButton.onclick = function () {
+                openEditModal(id);
+            };
+
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "Delete";
+            deleteButton.onclick = function () {
+                deleteHabit(id);
+            };
+
+            habitItem.appendChild(checkbox);
+            habitItem.appendChild(habitLabel);
+            habitItem.appendChild(editButton);
+            habitItem.appendChild(deleteButton);
+
+            return habitItem;
+        }
+
+        function openEditModal(id) {
+            const habitLabel = document.querySelector(`label[for="${id}"]`);
+            const habitColor = habitLabel.parentNode.style.backgroundColor;
+
+            document.getElementById("editLabel").value = habitLabel.textContent;
+            document.getElementById("editColor").value = habitColor;
+
+            currentEditId = id;
+            document.getElementById("editModal").style.display = "block";
+        }
+
+        function saveEdit() {
+            const habitLabel = document.querySelector(`label[for="${currentEditId}"]`);
+            const habitItem = habitLabel.parentNode;
+            const newLabel = document.getElementById("editLabel").value;
+            const newColor = document.getElementById("editColor").value;
+
+            habitLabel.textContent = newLabel;
+            habitItem.style.backgroundColor = newColor;
+
+            closeModal();
+        }
+
+        function deleteHabit(id) {
+            const habitItem = document.getElementById(id);
+            habitItem.parentNode.removeChild(habitItem);
+        }
+
+        function closeModal() {
+            document.getElementById("editModal").style.display = "none";
+            currentEditId = undefined;
+        }
+    </script>
+
+</body>
+</html>
